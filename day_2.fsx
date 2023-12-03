@@ -35,10 +35,27 @@ let isGamePossible (game: Game) red green blue =
         printfn $"Game {game.id} is not possible because totalRed = {game.red}, totalGreen = {game.green}, totalBlue = {game.blue}" 
         false
 
-let solution = 
+let allGames =
     readInput()
     |> Array.map parseGame
+
+let possibleGames = 
+    allGames
     |> Array.filter (fun game -> isGamePossible game 12 13 14)
+
+let part1 = 
+    possibleGames
     |> Array.sumBy _.id
 
-printfn $"Solution: {solution}"
+printfn $"Part1: {part1}"
+
+let computePowerOfGame (game: Game) =
+    let power = game.red * game.green * game.blue
+    printfn "Power of game %A is %d" game power
+    power
+
+let part2 =
+    allGames
+    |> Array.map computePowerOfGame
+    |> Array.sum
+printfn $"Part2: {part2}"

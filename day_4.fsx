@@ -2,6 +2,7 @@ open System.IO
 open System
 open System.Text.RegularExpressions
 open System.Collections.Generic
+
 type Card = {
     CardNumber: int
     WinningNumbers: int array
@@ -17,13 +18,13 @@ let readInput () =
 
 let parseCard (line: string) =
     let cardNbMatch = Regex.Match(line, "Card\s+(\d+):")
-    let cardNb = cardNbMatch.Groups.[1].Value |> int
+    let cardNb = cardNbMatch.Groups[1].Value |> int
     let splitCard = line |> split "|"
 
     let winningNumbers = 
         splitCard[0] 
         |> split ":" 
-        |> (fun x -> x.[1].Trim())
+        |> (fun x -> x[1].Trim())
         |> split " "
         |> Array.map int
 
@@ -71,7 +72,7 @@ let processTotal () =
     let rec processInternal (cardList: Card list) =         
         match cardList with
         | head :: tail -> 
-            counters[head.CardNumber] <- counters.[head.CardNumber] + 1
+            counters[head.CardNumber] <- counters[head.CardNumber] + 1
                 
             let winnings = getMatches head |> Array.length
             let copies = 

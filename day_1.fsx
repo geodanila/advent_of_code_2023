@@ -45,6 +45,7 @@ let part1 =
 printfn "Part1: %d" part1
 
 // Part 2
+
 let part2 = 
     readInput() 
     |> Seq.map (getFirstAndLastDigits complexDigitRegex)

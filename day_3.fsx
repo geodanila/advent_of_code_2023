@@ -35,7 +35,7 @@ let extractElement lineIndex (m: Match) : Element =
     | false, _ -> 
         Symbol(
         { 
-            Symbol = m.Value.[0]
+            Symbol = m.Value[0]
             X = m.Index
             Y = lineIndex
         })
@@ -44,7 +44,7 @@ let readSchematic (): Schematic =
     let inputPath = Path.Combine(__SOURCE_DIRECTORY__, "data" , "input_3.txt")    
     let lines = File.ReadAllLines(inputPath)
     let height = lines.Length
-    let width = lines.[0].Length
+    let width = lines[0].Length
     let elements = 
         lines
         |> Array.indexed

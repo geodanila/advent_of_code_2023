@@ -9,11 +9,11 @@ let blueRegex = "(\d+) blue"
 
 let extractMaxValue line regex =
     Regex.Matches(line, regex)
-    |> Seq.map (fun x -> x.Groups.[1].Value |> int)
+    |> Seq.map (fun x -> x.Groups[1].Value |> int)
     |> Seq.max
 
 let parseGame (line: string): Game =    
-    let id = Regex.Match(line, idRegex).Groups.[1].Value |> int
+    let id = Regex.Match(line, idRegex).Groups[1].Value |> int
     let red = extractMaxValue line redRegex
     let green = extractMaxValue line greenRegex
     let blue = extractMaxValue line blueRegex
@@ -25,12 +25,13 @@ let readInput () =
 
 let isGamePossible (game: Game) red green blue =    
     let isPossible = game.red <= red && game.green <= green && game.blue <= blue
-    if isPossible then
-        printfn $"Game {game.id} is possible because totalRed = {game.red} <= {red}, totalGreen = {game.green} <= {green}, totalBlue = {game.blue} <= {blue}" 
-        true
-    else
-        printfn $"Game {game.id} is not possible because totalRed = {game.red}, totalGreen = {game.green}, totalBlue = {game.blue}" 
-        false
+    isPossible
+    // if isPossible then
+    //     printfn $"Game {game.id} is possible because totalRed = {game.red} <= {red}, totalGreen = {game.green} <= {green}, totalBlue = {game.blue} <= {blue}" 
+    //     true
+    // else
+    //     printfn $"Game {game.id} is not possible because totalRed = {game.red}, totalGreen = {game.green}, totalBlue = {game.blue}" 
+    //     false
 
 let allGames =
     readInput()

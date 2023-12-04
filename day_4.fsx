@@ -62,28 +62,27 @@ printfn "Part1: %d" total
 
 // Part 2
 let processTotal () =
-    let mutable counters = Dictionary<int, int>()
-    let maxNb = cards |> Seq.map _.CardNumber |> Seq.max
+    let counters = Dictionary<int, int>()    
     let cardNumbers = cards |> List.map _.CardNumber
     let getWins (cardNb: int) = cards[cardNb - 1].Wins
         
-    for i in 1 .. maxNb do
+    for i in 1 .. cards.Length do
         counters.Add(i, 0)
 
-    let rec processInternal (cardList: int list) =         
-        match cardList with
-        | head :: tail ->                 
+    let rec processInternal head max =        
+        if head < max then
+            counters[head] <- counters[head] + 1
             let winnings = getWins head
             if winnings > 0 then
-                cardNumbers[head .. head + winnings - 1] 
-                |> processInternal
-            
-            processInternal tail
-            counters[head] <- counters[head] + 1
-        | [] -> ()
+                processInternal (head + 1) (head + winnings + 1)
+            processInternal (head + 1) max
+          
+    let first = List.head cardNumbers
+    let last = List.last cardNumbers + 1
+    processInternal first last
 
-    cardNumbers    
-    |> processInternal
+    // for kvp in counters do
+    //     printfn "%d: %d" kvp.Key kvp.Value
 
     counters 
     |> Seq.map (fun x -> x.Value)

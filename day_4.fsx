@@ -70,29 +70,28 @@ let takeOrAll count list =
 let processTotal () =
     let mutable counters = Dictionary<int, int>()
     let maxNb = cards |> Seq.map _.CardNumber |> Seq.max
+    let cardNumbers = cards |> List.map _.CardNumber
+    let getWins (cardNb: int) = cards[cardNb - 1].Wins
         
     for i in 1 .. maxNb do
         counters.Add(i, 0)
 
-    let rec processInternal (cardList: Card list) =         
+    let rec processInternal (cardList: int list) =         
         match cardList with
         | head :: tail -> 
-            counters[head.CardNumber] <- counters[head.CardNumber] + 1
+            counters[head] <- counters[head] + 1
                 
-            let winnings = head.Wins
-            let copies = 
-                if winnings > 0 then
-                    let remainingCards = cards |> List.skipWhile (fun x -> x.CardNumber <= head.CardNumber)
-                    if remainingCards.Length >= winnings 
-                        then remainingCards |> List.take winnings
-                        else remainingCards
-                else []
+            let winnings = getWins head
+            if winnings > 0 then
+                cardNumbers
+                |> List.skip (head)
+                |> takeOrAll winnings
+                |> processInternal
             
             processInternal tail
-            processInternal copies            
         | [] -> ()
 
-    cards 
+    cardNumbers    
     |> processInternal
 
     counters 

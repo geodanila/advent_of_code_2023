@@ -8,8 +8,8 @@ type Card = {
     MyNumbers: int array
 }
 
-let split (sep: string) (s: string) =
-    s.Split([|sep|], StringSplitOptions.RemoveEmptyEntries)
+let split (sep: string) (toSplit: string) =
+    toSplit.Split([|sep|], StringSplitOptions.RemoveEmptyEntries)
 
 let readInput () =
     let inputPath = Path.Combine(__SOURCE_DIRECTORY__, "data" , "input_4.txt")    
@@ -17,20 +17,21 @@ let readInput () =
 
 let parseCard (line: string) =
     let cardNbMatch = Regex.Match(line, "Card\s+(\d+):")
-    let cardNb = cardNbMatch.Groups.[1].Value
-
-    let cardNb' = int cardNb
+    let cardNb = cardNbMatch.Groups.[1].Value |> int
     let splitCard = line |> split "|"
 
     let winningNumbers = 
-        splitCard[0] |> split ":" 
+        splitCard[0] 
+        |> split ":" 
         |> (fun x -> x.[1].Trim())
         |> split " "
         |> Array.map int
+
     let myNumbers =
-        splitCard[1] |> split " "
+        splitCard[1] 
+        |> split " "
         |> Array.map int
-    { CardNumber = cardNb'; WinningNumbers = winningNumbers; MyNumbers = myNumbers }
+    { CardNumber = cardNb; WinningNumbers = winningNumbers; MyNumbers = myNumbers }
 
 let getMatches card =
     card.WinningNumbers     
@@ -50,46 +51,42 @@ let computeScore card =
 // Part 1
 let cards = 
     readInput () 
-    |> Array.map parseCard    
+    |> Array.map parseCard
+    |> Array.toList    
 
 let total =
     cards
-    |> Array.map (fun x -> (x.CardNumber, computeScore x))
-    |> Array.sumBy snd
+    |> List.map (fun x -> (x.CardNumber, computeScore x))
+    |> List.sumBy snd
 printfn "Part1: %d" total
-
-let toList (arr: 'a array) =
-    new List<'a>(arr)
 
 // Part 2
 let processTotal () =
-    let cardList = new List<Card>(cards)
     let mutable counters = Dictionary<int, int>()
     let maxNb = cards |> Seq.map _.CardNumber |> Seq.max
+    
     for i in 1 .. maxNb do
         counters.Add(i, 0)
 
-    let rec processInternal (cardList: List<Card>) = 
-        match cardList.Count with
-        | 0 -> ()
-        | _ -> 
-            let head = cardList[0]
-            cardList.RemoveAt(0)
+    let rec processInternal (cardList: Card list) =         
+        match cardList with
+        | head :: tail -> 
             counters[head.CardNumber] <- counters.[head.CardNumber] + 1
-            
+                
             let winnings = getMatches head |> Array.length
-            let toAdd = 
-                (if winnings > 0 then
-                    let remainingCards = cards |> Array.skipWhile (fun x -> x.CardNumber <= head.CardNumber)
+            let copies = 
+                if winnings > 0 then
+                    let remainingCards = cards |> List.skipWhile (fun x -> x.CardNumber <= head.CardNumber)
                     if remainingCards.Length >= winnings 
-                        then remainingCards |> Array.take winnings
+                        then remainingCards |> List.take winnings
                         else remainingCards
-                 else [||]) |> toList
+                else []
             
-            processInternal toAdd
-            processInternal cardList
+            processInternal copies
+            processInternal tail
+        | _ -> ()            
 
-    processInternal cardList
+    processInternal cards
 
     counters 
     |> Seq.map (fun x -> x.Value)

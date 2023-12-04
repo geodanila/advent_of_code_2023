@@ -17,9 +17,9 @@ type Symbol = {
 type Element = PartNumber of PartNumber | Symbol of Symbol
 
 type Schematic = {
-    width: int
-    height: int
-    elements: Element array
+    Width: int
+    Height: int
+    Elements: Element array
 }
 
 let extractElement lineIndex (m: Match) : Element =
@@ -52,7 +52,7 @@ let readSchematic (): Schematic =
             Regex.Matches(line, "\d+|[^.]")
             |> Seq.map (extractElement lineIndex)
             |> Seq.toArray)
-    { width = width; height = height; elements = elements }
+    { Width = width; Height = height; Elements = elements }
 
 let isAdjacent (p: PartNumber) (s: Symbol) =    
     if abs (p.Y - s.Y) > 1 then false // not on adjacent lines
@@ -66,12 +66,12 @@ let schematic = readSchematic ()
 
 let splitNumbersAndSymbols schematic =     
     let partNumbers = 
-        schematic.elements
+        schematic.Elements
         |> Array.map (function | PartNumber n -> Some n | _ -> None)
         |> Array.choose id
 
     let symbols =
-        schematic.elements
+        schematic.Elements
         |> Array.map (function | Symbol s -> Some s | _ -> None)
         |> Array.choose id
 

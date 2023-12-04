@@ -2,13 +2,23 @@ open System.IO
 open System
 open System.Text.RegularExpressions
 open System.Collections.Generic
+open System.Diagnostics
+
+let winCache = Dictionary<int, int>()
 
 type Card = {
     CardNumber: int
     WinningNumbers: int Set
     MyNumbers: int Set
-} with 
-    member this.Wins = (Set.intersect this.WinningNumbers this.MyNumbers).Count
+} with
+    member this.Wins =
+        match winCache.TryGetValue(this.CardNumber) with
+        | true, cacheValue -> 
+            cacheValue
+        | false, _ ->
+            let wins = (Set.intersect this.WinningNumbers this.MyNumbers).Count
+            winCache.Add(this.CardNumber, wins)
+            wins
 
 let split (sep: string) (toSplit: string) =
     toSplit.Split([|sep|], StringSplitOptions.RemoveEmptyEntries)

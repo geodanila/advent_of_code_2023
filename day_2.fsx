@@ -43,15 +43,17 @@ let possibleGames =
     allGames
     |> Array.filter (fun game -> isGamePossible game 12 13 14)
 
+// Part 1
 let part1 = 
     possibleGames
     |> Array.sumBy _.id
 
 printfn $"Part1: {part1}"
 
+// Part 2
 let computePowerOfGame (game: Game) =
     let power = game.red * game.green * game.blue
-    printfn "Power of game %A is %d" game power
+    //printfn "Power of game %A is %d" game power
     power
 
 let part2 =

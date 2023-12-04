@@ -6,7 +6,8 @@ let readInput () =
     let inputPath = Path.Combine(__SOURCE_DIRECTORY__, "data" , "input_1.txt")    
     File.ReadAllLines(inputPath)
 
-let digitRegex = @"(\d|one|two|three|four|five|six|seven|eight|nine)"
+let simpleDigitRegex = @"(\d)"
+let complexDigitRegex = @"(\d|one|two|three|four|five|six|seven|eight|nine)"
 
 let getDigitValue (digit: string) =
     match digit.ToLower() with
@@ -21,24 +22,34 @@ let getDigitValue (digit: string) =
     | "nine" -> 9
     | _ -> digit |> int
 
-let findDigit (line: string) =    
-    let digit = Regex.Match(line, digitRegex).Value
-    getDigitValue digit    
+let findDigit (line: string) regex =    
+    let digit = Regex.Match(line, regex).Value
+    getDigitValue digit
 
-let findLastDigit (line: string) =
-    let lastDigit = Regex.Match(line, digitRegex, RegexOptions.RightToLeft).Value
+let findLastDigit (line: string) regex =
+    let lastDigit = Regex.Match(line, regex, RegexOptions.RightToLeft).Value
     getDigitValue lastDigit
 
-let getFirstAndLastDigits (line: string) : (int * int) =
-    let firstDigit = findDigit line    
-    let lastDigit = findLastDigit line
+let getFirstAndLastDigits regex (line: string) : (int * int) =
+    let firstDigit = findDigit line regex
+    let lastDigit = findLastDigit line regex
     (firstDigit, lastDigit)
 
-let solution = 
+// Part 1
+let part1 =
     readInput() 
-    |> Seq.map getFirstAndLastDigits
+    |> Seq.map (getFirstAndLastDigits simpleDigitRegex)
     |> Seq.map (fun (first, last) -> first * 10 + last)
     |> Seq.sum
 
-printfn "Solution: %d" solution
+printfn "Part1: %d" part1
+
+// Part 2
+let part2 = 
+    readInput() 
+    |> Seq.map (getFirstAndLastDigits complexDigitRegex)
+    |> Seq.map (fun (first, last) -> first * 10 + last)
+    |> Seq.sum
+
+printfn "Part2: %d" part2
 

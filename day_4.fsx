@@ -60,12 +60,6 @@ let total =
     |> List.sumBy snd
 printfn "Part1: %d" total
 
-let takeOrAll count list =
-    let length = List.length list
-    if length >= count 
-        then list |> List.take count
-        else list
-
 // Part 2
 let processTotal () =
     let mutable counters = Dictionary<int, int>()
@@ -78,17 +72,14 @@ let processTotal () =
 
     let rec processInternal (cardList: int list) =         
         match cardList with
-        | head :: tail -> 
-            counters[head] <- counters[head] + 1
-                
+        | head :: tail ->                 
             let winnings = getWins head
             if winnings > 0 then
-                cardNumbers
-                |> List.skip (head)
-                |> takeOrAll winnings
+                cardNumbers[head .. head + winnings - 1] 
                 |> processInternal
             
             processInternal tail
+            counters[head] <- counters[head] + 1
         | [] -> ()
 
     cardNumbers    

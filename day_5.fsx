@@ -159,7 +159,6 @@ let findLowestLocation () =
 findLowestLocation ()
 |> printfn "Part1: %d"
 
-// todo: implement
 let locationToSeed (almanac: Almanac) (location: uint64) =
     let findMap destination =
         almanac.Maps        

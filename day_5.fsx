@@ -123,6 +123,12 @@ let applyMap (map: Map) (source: uint64) =
     |> Option.map (fun range -> range.DestinationRangeStart - range.SourceRangeStart + source)
     |> Option.defaultValue source
 
+let applyReverseMap (map: Map) (destination: uint64) =
+    map.Ranges
+    |> List.tryFind (fun range -> destination >= range.DestinationRangeStart && destination < range.DestinationRangeStart + range.RangeLength)
+    |> Option.map (fun range -> range.SourceRangeStart - range.DestinationRangeStart + destination)
+    |> Option.defaultValue destination
+
 let seedToLocation (almanac: Almanac) (seed: uint64) =
     let findMap source =
         almanac.Maps
@@ -141,13 +147,64 @@ let seedToLocation (almanac: Almanac) (seed: uint64) =
             source <- map.Destination
         | None -> source <- ""
 
-    current    
-
+    current
+    
 let almanac = readAlamanac ()
 
-let lowestLocation =
+let findLowestLocation () =
     almanac.SeedIds
     |> List.map (seedToLocation almanac)    
     |> List.min
 
-printfn "Part1: %d" lowestLocation
+findLowestLocation ()
+|> printfn "Part1: %d"
+
+// todo: implement
+let locationToSeed (almanac: Almanac) (location: uint64) =
+    let findMap destination =
+        almanac.Maps        
+        |> List.tryFind (fun x -> x.Destination = destination)
+
+    let mutable destination = "location"
+    let mutable current = location
+
+    while destination <> "" do
+        let map = findMap destination
+        match map with
+        | Some map -> 
+            //printf "Applying reverse map %s-to-%s on current %d" map.Destination map.Source current
+            current <- applyReverseMap map current
+            //printfn " => %d" current
+            destination <- map.Source
+        | None -> destination <- ""
+
+    current
+
+let findLowestLocationWithRanges () =
+    let seedIds =
+        almanac.SeedIds
+        |> List.pairwise
+        |> List.indexed
+        |> List.filter (fun (i, _) -> i % 2 = 0)
+        |> List.map snd
+
+    let isInitialSeed seed =
+        seedIds
+        |> List.exists (fun (start, range) -> seed >= start && seed < start + range)        
+
+    let found =
+        seq {
+            for location in seq { 0UL .. UInt64.MaxValue } do
+                let seed = locationToSeed almanac location
+                yield (location, seed)
+        } 
+        |> Seq.tryFind (fun (location, seed) -> isInitialSeed seed)
+        
+    match found with
+    | Some (location, seed) -> 
+        printfn "Lowest location is %d corresponding to seed %d" location seed
+        location
+    | None -> failwith "Could not determine minimum location number!"
+
+findLowestLocationWithRanges()
+|> printfn "Part2: %d"

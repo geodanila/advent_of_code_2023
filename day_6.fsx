@@ -1,10 +1,8 @@
 #load "common.fsx"
 
-open System.IO
-
 type Race = {
-    TimePressingButton: int
-    DistanceTravelled: int
+    TimePressingButton: uint64
+    DistanceTravelled: uint64
 }
 
 let readInput () =
@@ -15,14 +13,14 @@ let readInput () =
             timeRow 
             |> String.replace "Time:" ""
             |> String.splitTrim " "
-            |> Array.map int
+            |> Array.map uint64
             |> List.ofArray
 
         let distances =
             distanceRow
             |> String.replace "Distance:" ""
             |> String.splitTrim " "
-            |> Array.map int
+            |> Array.map uint64
             |> List.ofArray
        
         List.zip times distances
@@ -30,7 +28,7 @@ let readInput () =
     | _ -> failwith "Invalid input file!"
 
 let computeRaceTimes (race: Race) =
-    [0 .. race.TimePressingButton]
+    [0UL .. race.TimePressingButton]
     |> List.map (fun timeHoldingBtn -> 
         let mmPerMs = timeHoldingBtn
         let remainingTime = race.TimePressingButton - timeHoldingBtn
@@ -44,15 +42,38 @@ let getRecordBreakingTimes (race: Race) =
     |> List.filter (fun (t, d) -> d > race.DistanceTravelled)
     |> List.map fst
 
-let races = readInput ()
-
-let multiplyList list =
-    List.fold (fun acc x -> acc * x) 1 list
-
 let numberOfWaysOfWinning =
-    races 
+    readInput () 
     |> List.map getRecordBreakingTimes
     |> List.map (fun x -> x.Length)    
-    |> multiplyList
+    |> List.fold (fun acc x -> acc * x) 1
 
 printfn "Part1: %d" numberOfWaysOfWinning
+
+let readInputPart2 () =
+    let lines = Input.readAllLines "input_6.txt"
+    match lines with
+    | [| timeRow; distanceRow |] ->
+        let time = 
+            timeRow 
+            |> String.replace "Time:" ""            
+            |> String.replace " " ""
+            |> String.trim
+            |> uint64
+
+        let distance =
+            distanceRow
+            |> String.replace "Distance:" ""
+            |> String.replace " " ""
+            |> String.trim
+            |> uint64
+       
+        { TimePressingButton = time; DistanceTravelled = distance }        
+    | _ -> failwith "Invalid input file!"
+
+let numberOfWaysOfWinningPart2 =
+    readInputPart2 ()
+    |> getRecordBreakingTimes
+    |> List.length
+
+printfn "Part2: %d" numberOfWaysOfWinningPart2

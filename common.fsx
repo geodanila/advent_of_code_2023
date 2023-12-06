@@ -11,6 +11,9 @@ module String =
     let splitTrim (by: string) (str: string) =
         str.Split([| by |], StringSplitOptions.RemoveEmptyEntries ||| StringSplitOptions.TrimEntries)
 
+    let trim (str: string) =
+        str.Trim()
+
 module Input =    
     let readAllLines fileName =
         let inputPath = Path.Combine(__SOURCE_DIRECTORY__, "data" , fileName)

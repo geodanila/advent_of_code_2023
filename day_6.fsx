@@ -28,8 +28,8 @@ let readInput () =
     | _ -> failwith "Invalid input file!"
 
 let computeRaceTimes (race: Race) =
-    [0UL .. race.TimePressingButton]
-    |> List.map (fun timeHoldingBtn -> 
+    seq { 0UL .. race.TimePressingButton }
+    |> Seq.map (fun timeHoldingBtn -> 
         let mmPerMs = timeHoldingBtn
         let remainingTime = race.TimePressingButton - timeHoldingBtn
         let travelDistance = remainingTime * mmPerMs
@@ -39,14 +39,14 @@ let computeRaceTimes (race: Race) =
 let getRecordBreakingTimes (race: Race) =
     let raceTimes = computeRaceTimes race
     raceTimes
-    |> List.filter (fun (t, d) -> d > race.DistanceTravelled)
-    |> List.map fst
+    |> Seq.filter (fun (t, d) -> d > race.DistanceTravelled)
+    |> Seq.map fst
 
 let numberOfWaysOfWinning =
     readInput () 
-    |> List.map getRecordBreakingTimes
-    |> List.map (fun x -> x.Length)    
-    |> List.fold (fun acc x -> acc * x) 1
+    |> Seq.map getRecordBreakingTimes
+    |> Seq.map (fun x -> x |> Seq.length)    
+    |> Seq.fold (fun acc x -> acc * x) 1
 
 printfn "Part1: %d" numberOfWaysOfWinning
 
@@ -74,6 +74,6 @@ let readInputPart2 () =
 let numberOfWaysOfWinningPart2 =
     readInputPart2 ()
     |> getRecordBreakingTimes
-    |> List.length
+    |> Seq.length
 
 printfn "Part2: %d" numberOfWaysOfWinningPart2

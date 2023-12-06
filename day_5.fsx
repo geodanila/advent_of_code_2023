@@ -1,7 +1,7 @@
+#load "common.fsx"
+
 open System.IO
 open System
-
-let inputPath = Path.Combine(__SOURCE_DIRECTORY__, "data" , "input_5.txt")
 
 type Range = {
     DestinationRangeStart: uint64
@@ -25,16 +25,10 @@ type ParseState = {
     Maps: Map list
 }
 
-let replace (oldValue: string) (newValue: string) (str: string) =
-    str.Replace(oldValue, newValue)
-
-let splitTrim (by: string) (str: string) =
-    str.Split([| by |], StringSplitOptions.RemoveEmptyEntries ||| StringSplitOptions.TrimEntries)
-
 let parseSeedIds (line: string) =
     line
-    |> replace "seeds:" ""
-    |> splitTrim " "
+    |> String.replace "seeds:" ""
+    |> String.splitTrim " "
     |> Array.map uint64
     |> Array.toList
 
@@ -43,8 +37,8 @@ let (|MapHeader|_|) (line: string) =
     | s when s.EndsWith("map:") ->         
         let splitValues = 
             s 
-            |> replace " map:" "" 
-            |> splitTrim "-to-" 
+            |> String.replace " map:" "" 
+            |> String.splitTrim "-to-" 
         Some (MapHeader(splitValues[0], splitValues[1]))
     | _ -> 
         None
@@ -53,7 +47,7 @@ let (|Range|_|) (line: string) =
     match line with
     | "" -> None
     | s ->
-        let splitLine = s |> splitTrim " "
+        let splitLine = s |> String.splitTrim " "
         if splitLine.Length <> 3 then
             None
         else
@@ -64,15 +58,17 @@ let (|Range|_|) (line: string) =
                 RangeLength = values[2] 
             }
 
-let readAlamanac () =     
+let readAlamanac () = 
+    let lines = Input.readLines "input_5.txt"
+
     let seedIds =
-        File.ReadLines(inputPath)
+        lines
         |> Seq.take(1)
         |> Seq.head        
         |> parseSeedIds
 
     let mapLines =
-        File.ReadLines(inputPath)
+        lines
         |> Seq.skip(2)
 
     let initialState = {  

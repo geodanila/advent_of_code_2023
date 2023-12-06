@@ -1,10 +1,8 @@
-open System.IO
-open System
+#load "common.fsx"
+
 open System.Text.RegularExpressions
 
-let readInput () =
-    let inputPath = Path.Combine(__SOURCE_DIRECTORY__, "data" , "input_1.txt")    
-    File.ReadAllLines(inputPath)
+let readInput () = Input.readAllLines "input_1.txt"
 
 let simpleDigitRegex = @"(\d)"
 let complexDigitRegex = @"(\d|one|two|three|four|five|six|seven|eight|nine)"

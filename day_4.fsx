@@ -1,3 +1,5 @@
+#load "common.fsx"
+
 open System.IO
 open System
 open System.Text.RegularExpressions
@@ -20,29 +22,24 @@ type Card = {
             winCache.Add(this.CardNumber, wins)
             wins
 
-let split (sep: string) (toSplit: string) =
-    toSplit.Split([|sep|], StringSplitOptions.RemoveEmptyEntries)
-
-let readInput () =
-    let inputPath = Path.Combine(__SOURCE_DIRECTORY__, "data" , "input_4.txt")    
-    File.ReadAllLines(inputPath)
+let readInput () = Input.readAllLines "input_4.txt"
 
 let parseCard (line: string) =
     let cardNbMatch = Regex.Match(line, "Card\s+(\d+):")
     let cardNb = cardNbMatch.Groups[1].Value |> int
-    let splitCard = line |> split "|"
+    let splitCard = line |> String.splitTrim "|"
 
     let winningNumbers = 
         splitCard[0] 
-        |> split ":" 
+        |> String.splitTrim ":" 
         |> (fun x -> x[1].Trim())
-        |> split " "
+        |> String.splitTrim " "
         |> Array.map int
         |> Set.ofArray
 
     let myNumbers =
         splitCard[1] 
-        |> split " "
+        |> String.splitTrim " "
         |> Array.map int
         |> Set.ofArray
 

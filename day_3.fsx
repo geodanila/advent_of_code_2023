@@ -1,3 +1,5 @@
+#load "common.fsx"
+
 open System.IO
 open System.Text.RegularExpressions
 
@@ -41,8 +43,7 @@ let extractElement lineIndex (m: Match) : Element =
         })
 
 let readSchematic (): Schematic =
-    let inputPath = Path.Combine(__SOURCE_DIRECTORY__, "data" , "input_3.txt")    
-    let lines = File.ReadAllLines(inputPath)
+    let lines = Input.readAllLines "input_3.txt"
     let height = lines.Length
     let width = lines[0].Length
     let elements = 

@@ -1,3 +1,5 @@
+#load "common.fsx"
+
 open System.IO
 open System.Text.RegularExpressions
 type Game = { id: int; red: int; green: int; blue: int }
@@ -19,9 +21,7 @@ let parseGame (line: string): Game =
     let blue = extractMaxValue line blueRegex
     { id = id; red = red; green = green; blue = blue}
 
-let readInput () =
-    let inputPath = Path.Combine(__SOURCE_DIRECTORY__, "data" , "input_2.txt")    
-    File.ReadAllLines(inputPath)    
+let readInput () = Input.readAllLines "input_2.txt"
 
 let isGamePossible (game: Game) red green blue =    
     let isPossible = game.red <= red && game.green <= green && game.blue <= blue

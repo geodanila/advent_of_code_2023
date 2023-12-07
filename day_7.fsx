@@ -102,15 +102,13 @@ module Hand =
                     if cardScore1 <> cardScore2 then                        
                         yield cardScore1.CompareTo(cardScore2)
                 yield 0
-            } |> Seq.head
+            } |> Seq.head // no early return in F#? No problem :P
 
         match (getHandType hand1), (getHandType hand2) with
             | a, b when a = b ->                
-                let result = compareSameHandType hand1 hand2
-                // printfn "Comparing 2 hands of same type %A %A <-> %A => %d" a (toString hand1) (toString hand2) result
-                result
+                compareSameHandType hand1 hand2
             | a, b -> 
-                a.CompareTo(b)
+                a.CompareTo(b) // use hand type value from enum
 
 let readInput () =
     Input.readAllLines "input_7.txt"
@@ -124,14 +122,11 @@ let readInput () =
 
 let checkWinnings (compare: Hand -> Hand -> int) (hands: (Hand * int) array) =
     hands
-    |> Array.sortWith (fun (hand1, _) (hand2, _) -> compare hand1 hand2)
-    |> Array.indexed // set the rank using the index    
-    |> Array.map (fun (rank, (hand, bid)) -> 
-        //printfn "Hand: %s, Rank: %d" (Hand.toString hand) (rank + 1)
-        (rank, hand, bid))
-    |> Array.sumBy (fun (rank, _, bid) -> (rank + 1) * bid)
+    |> Array.sortWith (fun (hand1, _) (hand2, _) -> compare hand1 hand2) // sort the hands based on their hand type
+    |> Array.indexed    
+    |> Array.map (fun (index, (hand, bid)) -> index + 1, hand, bid) // set the rank using the index
+    |> Array.sumBy (fun (rank, _, bid) -> rank * bid)
 
-printfn "============ PART1 ============"
 let input = readInput ()
 
 let part1Compare = Hand.compare Hand.getHandType Card.getScore
@@ -146,33 +141,29 @@ printfn ""
 // Part 2
 let part2GetCardScore (card: Card) =
     match card with
-    | J -> 1
+    | J -> 1 // Jokers have a score of 1 according to the specs, when comparing hands of same type
     | _ -> Card.getScore card
 
 let part2GetHandType (hand: Hand) =
+    // replace Jokers with card of highest value that occurs the most times
     let (Cards cards) = hand
-    let maxCardType = 
+    let groupedByCard =
         cards
-        |> List.sortByDescending (fun x -> part2GetCardScore x)
-        |> List.groupBy id         
-        |> List.sortByDescending (fun g -> Hand.nbOfCards g)
-        |> (fun x -> 
-            if x.Head |> fst = J && x.Length > 1 
-                then x.Tail
-                else x
-        )
-        //|> (fun x -> printfn "Hand %s has max card type %A" (Hand.toString hand) (x.Head |> fst); x)
-        |> List.head
-        |> fst
+        |> List.sortByDescending part2GetCardScore
+        |> List.groupBy id
+        |> List.sortByDescending Hand.nbOfCards
+
+    let maxCardType =         
+        // edge case when there are more jokers than other card types
+        if groupedByCard.Head |> fst = J && groupedByCard.Length > 1 
+            then groupedByCard.Tail.Head |> fst
+            else groupedByCard.Head |> fst
+
     let newCards = cards |> List.map (function | J -> maxCardType | x -> x)
     let adjustedHand = Cards newCards
     
-    // if adjustedHand <> hand then
-    //     printfn "Adjusted hand from %s to %s" (Hand.toString hand) (Hand.toString adjustedHand)
-
+    // use the adjusted hand to get the hand type
     Hand.getHandType(adjustedHand)
-
-printfn "============ PART2 ============"
 
 let part2Compare = 
     Hand.compare part2GetHandType part2GetCardScore

@@ -14,6 +14,12 @@ module String =
     let trim (str: string) =
         str.Trim()
 
+    let toList (str: string) : char list =
+        seq {
+            for c in str do
+                yield c
+        } |> Seq.toList
+
 module Input =    
     let readAllLines fileName =
         let inputPath = Path.Combine(__SOURCE_DIRECTORY__, "data" , fileName)
@@ -22,3 +28,8 @@ module Input =
     let readLines fileName =
         let inputPath = Path.Combine(__SOURCE_DIRECTORY__, "data" , fileName)
         File.ReadLines(inputPath)
+
+module Debug =
+    let print str value =
+        printfn str value
+        value

@@ -93,7 +93,7 @@ printfn ""
 
 let countStepsPart2 (input: Input) =
     let (directions, instructions) = input
-    let mutable count = 0
+    
     let startingInstructions = 
         instructions 
         |> List.filter _.Source.EndsWith("A")

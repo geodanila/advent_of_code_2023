@@ -29,7 +29,3 @@ module Input =
         let inputPath = Path.Combine(__SOURCE_DIRECTORY__, "data" , fileName)
         File.ReadLines(inputPath)
 
-module Debug =
-    let print str value =
-        printfn str value
-        value

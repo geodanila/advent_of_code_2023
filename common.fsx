@@ -29,3 +29,15 @@ module Input =
         let inputPath = Path.Combine(__SOURCE_DIRECTORY__, "data" , fileName)
         File.ReadLines(inputPath)
 
+module Array2D =
+    let tryFindLocation predicate (array: 'a [,]) =
+        let rows = array.GetLength(0)
+        let columns = array.GetLength(1)
+        seq {
+            for i = 0 to rows - 1 do
+            for j = 0 to columns - 1 do
+                if predicate array.[i, j] then
+                    (i, j)
+        } |> Seq.tryHead
+
+        

@@ -179,7 +179,7 @@ let isValidPosition (tiles: Tiles) i j (visited: HashSet<_>) =
     //printfn "checking %i, %i with maxRow=%i and maxCol=%i" i j maxRow maxCol
     match i, j with
     | i, j when i < 0 || i > maxRow || j < 0 || j > maxCol -> false
-    | i, j when  visited.Count > 2 && tiles[i,j] = Start -> true
+    | i, j when  visited.Count >= 4 && tiles[i,j] = Start -> true // need at least 4 tiles to form a loop
     | i, j when visited.Contains(i, j) -> false
     | _ -> true
 

@@ -30,7 +30,7 @@ module Input =
         File.ReadLines(inputPath)
 
 module Array2D =
-    let tryFindLocation predicate (array: 'a [,]) =
+    let tryFindLocation predicate (array: 'a[,]) =
         let rows = array.GetLength(0)
         let columns = array.GetLength(1)
         seq {
@@ -39,5 +39,3 @@ module Array2D =
                 if predicate array.[i, j] then
                     (i, j)
         } |> Seq.tryHead
-
-        
